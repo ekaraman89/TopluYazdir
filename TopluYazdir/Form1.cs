@@ -40,6 +40,7 @@ namespace TopluYazdir
             var ts = lst.GroupBy(x => x.Firma).Select(y => y.First().Firma).ToArray();
 
             chkListFirma.Items.AddRange(ts);
+            chkListFirma.Items.Insert(0, "Tümünü Seç");
         }
 
         List<Dosya> lst = new List<Dosya>();
@@ -72,6 +73,22 @@ namespace TopluYazdir
         private void chkListFirma_SelectedIndexChanged(object sender, EventArgs e)
         {
             Firmalar.Clear();
+
+            bool check = false;
+            if (chkListFirma.GetItemCheckState(0) == CheckState.Checked) check = true;
+
+            if (((CheckedListBox)sender).SelectedIndex == 0)
+            {
+                for (int i = 0; i < chkListFirma.Items.Count; i++)
+                {
+                    chkListFirma.SetItemChecked(i, check);
+                }
+            }
+            else
+            {
+                chkListFirma.SetItemChecked(0, false);
+            }
+
             foreach (string item in chkListFirma.CheckedItems)
             {
                 Firmalar.Add(item);
@@ -168,6 +185,21 @@ namespace TopluYazdir
                 p.Kill();
         }
 
+        public void Print(string file)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = "print";
+            psi.Arguments = string.Format(file);
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+
+            Process p = new Process();
+            p.StartInfo = psi;
+            p.Start();
+
+            while (!p.HasExited) ;
+        }
+
         private void btnPrint_Click(object sender, EventArgs e)
         {
             if (lstBoxFiles.Items.Count > 0)
@@ -175,7 +207,8 @@ namespace TopluYazdir
                 if (MessageBox.Show(lstBoxFiles.Items.Count + " adet dosya yazıcıya gönderilecek. Onaylıyor musunuz ?", "Yazdırma Onayı", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     foreach (var item in lstBoxFiles.Items)
                     {
-                        SendToPrinter(item.ToString());
+                        //SendToPrinter(item.ToString());
+                        Print(item.ToString());
                     }
             }
             else
