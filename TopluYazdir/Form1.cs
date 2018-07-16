@@ -36,11 +36,13 @@ namespace TopluYazdir
 
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
+            chkListFirma.Items.Clear();
             GetAllFiles();
             var ts = lst.GroupBy(x => x.Firma).Select(y => y.First().Firma).ToArray();
-
+            
             chkListFirma.Items.AddRange(ts);
-            chkListFirma.Items.Insert(0, "Tümünü Seç");
+            if (chkListFirma.Items.Count > 0)
+                chkListFirma.Items.Insert(0, "Tümünü Seç");
         }
 
         List<Dosya> lst = new List<Dosya>();
@@ -132,7 +134,7 @@ namespace TopluYazdir
             {
                 Tur.Add(item);
             }
-           
+
             var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur)).ToList();
             ReadyToPrint(ts);
 
@@ -175,7 +177,7 @@ namespace TopluYazdir
                 MessageBox.Show("Liste Boş");
             }
         }
-                
+
         private void Print(string[] files)
         {
             if (printDialog.ShowDialog() == DialogResult.OK)

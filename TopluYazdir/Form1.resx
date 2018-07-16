@@ -129,7 +129,7 @@
     <value>0</value>
   </data>
   <data name="btnSelectFolder.Text" xml:space="preserve">
-    <value>Dosya Yolu Ayarla</value>
+    <value>Dosya Yolu Gösterin</value>
   </data>
   <data name="&gt;&gt;btnSelectFolder.Name" xml:space="preserve">
     <value>btnSelectFolder</value>
