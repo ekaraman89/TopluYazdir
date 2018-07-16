@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Spire.Pdf;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace TopluYazdir
 {
-    public partial class Form1 : Form
+    public partial class frmTopluYazdir : Form
     {
-        public Form1()
+        public frmTopluYazdir()
         {
             InitializeComponent();
         }
@@ -55,13 +57,16 @@ namespace TopluYazdir
             FolderBrowserDialog fbd = new FolderBrowserDialog();
 
             DialogResult result = fbd.ShowDialog();
-            string[] allfiles = Directory.GetFiles(fbd.SelectedPath, "*.*", SearchOption.AllDirectories);
-
-            foreach (var file in allfiles)
+            if (result == DialogResult.OK)
             {
-                FileInfo info = new FileInfo(file);
-                Dosya dosya = new Dosya(info);
-                lst.Add(dosya);
+                string[] allfiles = Directory.GetFiles(fbd.SelectedPath, "*.*", SearchOption.AllDirectories);
+
+                foreach (var file in allfiles.OrderBy(x => x))
+                {
+                    FileInfo info = new FileInfo(file);
+                    Dosya dosya = new Dosya(info);
+                    lst.Add(dosya);
+                }
             }
         }
 
@@ -94,14 +99,15 @@ namespace TopluYazdir
                 Firmalar.Add(item);
             }
 
-            lstBoxFiles.Items.Clear();
 
             tmp = Query(x => Firmalar.Contains(x.Firma));
-            lstBoxFiles.Items.AddRange(tmp.Select(x => x.Yol).ToArray());
 
             var ts = tmp.GroupBy(x => x.Donem).Select(y => y.First().Donem).ToArray();
             chkListDonem.Items.Clear();
             chkListDonem.Items.AddRange(ts);
+
+            ReadyToPrint(tmp);
+
         }
 
         private void chkListDonem_SelectedIndexChanged(object sender, EventArgs e)
@@ -112,19 +118,12 @@ namespace TopluYazdir
                 Donemler.Add(item);
             }
 
-            lstBoxFiles.Items.Clear();
-
-
             var ts = tmp.Where(x => Donemler.Contains(x.Donem)).ToList();
 
             chkListTur.Items.Clear();
             chkListTur.Items.AddRange(ts.GroupBy(x => x.Tur).Select(y => y.First().Tur).ToArray());
 
-            // var lstforlstbox = tmp.Where(x => Donemler.Contains(x.Donem)).ToList().GroupBy(x => new { x.Tur, x.Cins }).ToList();
-            // listBox1.Items.AddRange(lstforlstbox.Select(x => x.First().Yol).ToArray());
-            // listBox1.Items.AddRange(ts.GroupBy(x => x.Tur).Select(x => x.First().Yol).ToArray());
-            lstBoxFiles.Items.AddRange(ts.Select(x => x.Yol).ToArray());
-
+            ReadyToPrint(ts);
 
         }
 
@@ -135,69 +134,34 @@ namespace TopluYazdir
             {
                 Tur.Add(item);
             }
-            lstBoxFiles.Items.Clear();
+           
             var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur)).ToList();
-
-            lstBoxFiles.Items.AddRange(ts.Select(x => x.Yol).ToArray());
+            ReadyToPrint(ts);
 
         }
 
         private void rdBtnAll_CheckedChanged(object sender, EventArgs e)
         {
             var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur)).ToList();
-            lstBoxFiles.Items.Clear();
-            lstBoxFiles.Items.AddRange(ts.Select(x => x.Yol).ToArray());
+            ReadyToPrint(ts);
         }
 
         private void rdBtnBeyanname_CheckedChanged(object sender, EventArgs e)
         {
             var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur) && x.Cins.ToLower().Contains("beyanname")).ToList();
-            lstBoxFiles.Items.Clear();
-
-            lstBoxFiles.Items.AddRange(ts.Select(x => x.Yol).ToArray());
-
+            ReadyToPrint(ts);
         }
 
         private void rdBtnTahakkuk_CheckedChanged(object sender, EventArgs e)
         {
             var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur) && x.Cins.ToLower().Contains("tahakkuk")).ToList();
-            lstBoxFiles.Items.Clear();
-
-            lstBoxFiles.Items.AddRange(ts.Select(x => x.Yol).ToArray());
-
+            ReadyToPrint(ts);
         }
 
-        private void SendToPrinter(string file)
+        private void rdBtnHizmet_CheckedChanged(object sender, EventArgs e)
         {
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.Verb = "print";
-            info.FileName = file;
-            info.CreateNoWindow = true;
-            info.WindowStyle = ProcessWindowStyle.Hidden;
-
-            Process p = new Process();
-            p.StartInfo = info;
-            p.Start();
-
-            p.WaitForInputIdle();
-            System.Threading.Thread.Sleep(3000);
-            if (false == p.CloseMainWindow())
-                p.Kill();
-        }
-
-        public void Print(string file)
-        {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "print";
-            psi.Arguments = string.Format(file);
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-
-            Process p = new Process();
-            p.StartInfo = psi;
-            p.Start();
-
-            while (!p.HasExited) ;
+            var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur) && x.Cins.ToLower().Contains("hizmet_listesi")).ToList();
+            ReadyToPrint(ts);
         }
 
         private void btnPrint_Click(object sender, EventArgs e)
@@ -205,17 +169,39 @@ namespace TopluYazdir
             if (lstBoxFiles.Items.Count > 0)
             {
                 if (MessageBox.Show(lstBoxFiles.Items.Count + " adet dosya yazıcıya gönderilecek. Onaylıyor musunuz ?", "Yazdırma Onayı", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    foreach (var item in lstBoxFiles.Items)
-                    {
-                        //SendToPrinter(item.ToString());
-                        Print(item.ToString());
-                    }
+                    Print(lstBoxFiles.Items.OfType<string>().ToArray());
+                MessageBox.Show("Yazdırma işlemi tamamlandı");
             }
             else
             {
                 MessageBox.Show("Liste Boş");
             }
         }
+                
+        private void Print(string[] files)
+        {
+            if (printDialog.ShowDialog() == DialogResult.OK)
+            {
+                foreach (var item in files)
+                {
+                    using (PdfDocument doc = new PdfDocument())
+                    {
+                        doc.LoadFromFile(item);
+                        doc.PrintFromPage = printDialog.PrinterSettings.FromPage;
+                        doc.PrintToPage = printDialog.PrinterSettings.ToPage;
+                        doc.PrinterName = printDialog.PrinterSettings.PrinterName;
+                        doc.PrintDocument.Print();
+                        doc.Dispose();
+                    }
+                }
+            }
+        }
 
+        private void ReadyToPrint(List<Dosya> printList)
+        {
+            lstBoxFiles.Items.Clear();
+            lstBoxFiles.Items.AddRange(printList.Select(x => x.Yol).ToArray());
+            label1.Text = $"{lstBoxFiles.Items.Count} Dosya Seçildi";
+        }
     }
 }
