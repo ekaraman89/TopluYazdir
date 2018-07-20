@@ -160,7 +160,7 @@ namespace TopluYazdir
 
         private void rdBtnHizmet_CheckedChanged(object sender, EventArgs e)
         {
-            var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur) && x.Cins.ToLower().Contains("hizmet_listesi")).ToList();
+            var ts = tmp.Where(x => Donemler.Contains(x.Donem) && Tur.Contains(x.Tur) && x.Cins.ToLower().Contains("hizmet")).ToList();
             ReadyToPrint(ts);
         }
 
