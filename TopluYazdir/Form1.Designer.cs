@@ -112,6 +112,7 @@
             // 
             // printDialog
             // 
+            this.printDialog.AllowPrintToFile = false;
             this.printDialog.UseEXDialog = true;
             // 
             // label1

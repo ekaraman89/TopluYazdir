@@ -188,8 +188,9 @@ namespace TopluYazdir
                     {
                         doc.LoadFromFile(item);
                         doc.PrintFromPage = printDialog.PrinterSettings.FromPage;
-                        doc.PrintToPage = printDialog.PrinterSettings.ToPage;
+                        doc.PrintToPage = doc.Pages.Count;
                         doc.PrinterName = printDialog.PrinterSettings.PrinterName;
+                        doc.PrintDocument.PrinterSettings.Copies = printDialog.PrinterSettings.Copies;
                         doc.PrintDocument.Print();
                         doc.Dispose();
                     }
