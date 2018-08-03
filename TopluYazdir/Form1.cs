@@ -39,7 +39,7 @@ namespace TopluYazdir
             chkListFirma.Items.Clear();
             GetAllFiles();
             var ts = lst.GroupBy(x => x.Firma).Select(y => y.First().Firma).ToArray();
-            
+
             chkListFirma.Items.AddRange(ts);
             if (chkListFirma.Items.Count > 0)
                 chkListFirma.Items.Insert(0, "Tümünü Seç");
@@ -186,14 +186,17 @@ namespace TopluYazdir
                 {
                     using (PdfDocument doc = new PdfDocument())
                     {
-                        doc.LoadFromFile(item);
+
+                        doc.LoadFromFile(item, FileFormat.PDF);
                         doc.PrintFromPage = printDialog.PrinterSettings.FromPage;
                         doc.PrintToPage = doc.Pages.Count;
                         doc.PrinterName = printDialog.PrinterSettings.PrinterName;
                         doc.PrintDocument.PrinterSettings.Copies = printDialog.PrinterSettings.Copies;
+
                         doc.PrintDocument.Print();
                         doc.Dispose();
                     }
+
                 }
             }
         }
@@ -204,5 +207,6 @@ namespace TopluYazdir
             lstBoxFiles.Items.AddRange(printList.Select(x => x.Yol).ToArray());
             label1.Text = $"{lstBoxFiles.Items.Count} Dosya Seçildi";
         }
+
     }
 }
