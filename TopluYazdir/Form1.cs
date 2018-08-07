@@ -1,7 +1,9 @@
-﻿using Spire.Pdf;
+﻿using Microsoft.Win32;
+using Spire.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -169,7 +171,11 @@ namespace TopluYazdir
             if (lstBoxFiles.Items.Count > 0)
             {
                 if (MessageBox.Show(lstBoxFiles.Items.Count + " adet dosya yazıcıya gönderilecek. Onaylıyor musunuz ?", "Yazdırma Onayı", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Print(lstBoxFiles.Items.OfType<string>().ToArray());
+                    // Print(lstBoxFiles.Items.OfType<string>().ToArray());
+                    foreach (var item in lstBoxFiles.Items.OfType<string>())
+                    {
+                        Print(item);
+                    }
                 MessageBox.Show("Yazdırma işlemi tamamlandı");
             }
             else
@@ -208,5 +214,23 @@ namespace TopluYazdir
             label1.Text = $"{lstBoxFiles.Items.Count} Dosya Seçildi";
         }
 
+        public bool Print(string file)
+        {
+            try
+            {
+                if (printDialog.ShowDialog() == DialogResult.OK)
+                {
+
+                    Process.Start(
+                   Registry.LocalMachine.OpenSubKey(
+                        @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                        @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
+                   string.Format("/h /t \"{0}\" \"{1}\"", file, printDialog.PrinterSettings.PrinterName));
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
     }
 }
