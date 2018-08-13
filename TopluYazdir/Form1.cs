@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using Spire.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -171,39 +170,12 @@ namespace TopluYazdir
             if (lstBoxFiles.Items.Count > 0)
             {
                 if (MessageBox.Show(lstBoxFiles.Items.Count + " adet dosya yazıcıya gönderilecek. Onaylıyor musunuz ?", "Yazdırma Onayı", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    // Print(lstBoxFiles.Items.OfType<string>().ToArray());
-                    foreach (var item in lstBoxFiles.Items.OfType<string>())
-                    {
-                        Print(item);
-                    }
+                    Print(lstBoxFiles.Items.OfType<string>().ToArray());
                 MessageBox.Show("Yazdırma işlemi tamamlandı");
             }
             else
             {
                 MessageBox.Show("Liste Boş");
-            }
-        }
-
-        private void Print(string[] files)
-        {
-            if (printDialog.ShowDialog() == DialogResult.OK)
-            {
-                foreach (var item in files)
-                {
-                    using (PdfDocument doc = new PdfDocument())
-                    {
-
-                        doc.LoadFromFile(item, FileFormat.PDF);
-                        doc.PrintFromPage = printDialog.PrinterSettings.FromPage;
-                        doc.PrintToPage = doc.Pages.Count;
-                        doc.PrinterName = printDialog.PrinterSettings.PrinterName;
-                        doc.PrintDocument.PrinterSettings.Copies = printDialog.PrinterSettings.Copies;
-
-                        doc.PrintDocument.Print();
-                        doc.Dispose();
-                    }
-
-                }
             }
         }
 
@@ -214,23 +186,23 @@ namespace TopluYazdir
             label1.Text = $"{lstBoxFiles.Items.Count} Dosya Seçildi";
         }
 
-        public bool Print(string file)
+        public void Print(string[] files)
         {
             try
             {
                 if (printDialog.ShowDialog() == DialogResult.OK)
                 {
-
-                    Process.Start(
-                   Registry.LocalMachine.OpenSubKey(
+                    foreach (var item in files)
+                    {
+                        Process.Start(
+                        Registry.LocalMachine.OpenSubKey(
                         @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
                         @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
-                   string.Format("/h /t \"{0}\" \"{1}\"", file, printDialog.PrinterSettings.PrinterName));
-                    return true;
+                        string.Format("/h /t \"{0}\" \"{1}\"", item, printDialog.PrinterSettings.PrinterName));
+                    }
                 }
             }
             catch { }
-            return false;
         }
     }
 }

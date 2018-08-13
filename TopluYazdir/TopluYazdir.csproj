@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>TopluYazdir</RootNamespace>
     <AssemblyName>TopluYazdir</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>C:\Users\emrah\Desktop\aa\</PublishUrl>
@@ -50,12 +50,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Spire.License, Version=1.3.6.40, Culture=neutral, PublicKeyToken=b1144360237c8b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\FreeSpire.Office.3.0\lib\net40\Spire.License.dll</HintPath>
-    </Reference>
-    <Reference Include="Spire.Pdf, Version=4.5.1.2040, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
-      <HintPath>..\packages\FreeSpire.Office.3.0\lib\net40\Spire.Pdf.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -89,7 +83,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
