@@ -39,11 +39,18 @@ namespace TopluYazdir
         {
             chkListFirma.Items.Clear();
             GetAllFiles();
+
             var ts = lst.GroupBy(x => x.Firma).Select(y => y.First().Firma).ToArray();
 
             chkListFirma.Items.AddRange(ts);
             if (chkListFirma.Items.Count > 0)
                 chkListFirma.Items.Insert(0, "Tümünü Seç");
+
+            rdBtnAll.Checked = true;
+            chkListDonem.Items.Clear();
+            chkListTur.Items.Clear();
+            lstBoxFiles.Items.Clear();
+
         }
 
         List<Dosya> lst = new List<Dosya>();
@@ -60,13 +67,21 @@ namespace TopluYazdir
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK)
             {
+                lst.Clear();
+
                 string[] allfiles = Directory.GetFiles(fbd.SelectedPath, "*.*", SearchOption.AllDirectories);
 
                 foreach (var file in allfiles.OrderBy(x => x))
                 {
                     FileInfo info = new FileInfo(file);
-                    Dosya dosya = new Dosya(info);
-                    lst.Add(dosya);
+                    try
+                    {
+                        Dosya dosya = new Dosya(info);
+                        lst.Add(dosya);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
@@ -192,6 +207,14 @@ namespace TopluYazdir
             {
                 if (printDialog.ShowDialog() == DialogResult.OK)
                 {
+                    //for (int i = 0; i < files.Length - 1; i++)
+                    //{
+                    //    Process.Start(
+                    //    Registry.LocalMachine.OpenSubKey(
+                    //    @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                    //    @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
+                    //    string.Format("/h /t \"{0}\" \"{1}\"", files[i], printDialog.PrinterSettings.PrinterName));
+                    //}
                     foreach (var item in files)
                     {
                         Process.Start(
@@ -203,6 +226,24 @@ namespace TopluYazdir
                 }
             }
             catch { }
+        }
+
+        private void txtFirmaAra_TextChanged(object sender, EventArgs e)
+        {
+            string find = txtFirmaAra.Text.ToUpper();
+            chkListFirma.Items.Clear();
+            var ts = lst.GroupBy(x => x.Firma).Select(y => y.First().Firma).ToArray();
+            chkListFirma.Items.AddRange(ts);
+
+            if (!string.IsNullOrWhiteSpace(find))
+            {
+                ts = lst.Where(x => x.Firma.Contains(find)).GroupBy(y => y.Firma).Select(z => z.First().Firma).ToArray();
+                chkListFirma.Items.Clear();
+                chkListFirma.Items.AddRange(ts);
+            }
+
+            if (chkListFirma.Items.Count > 0)
+                chkListFirma.Items.Insert(0, "Tümünü Seç");
         }
     }
 }

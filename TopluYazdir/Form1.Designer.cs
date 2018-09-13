@@ -41,6 +41,8 @@
             this.printDialog = new System.Windows.Forms.PrintDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.rdBtnHizmet = new System.Windows.Forms.RadioButton();
+            this.txtFirmaAra = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -127,10 +129,23 @@
             this.rdBtnHizmet.UseVisualStyleBackColor = true;
             this.rdBtnHizmet.CheckedChanged += new System.EventHandler(this.rdBtnHizmet_CheckedChanged);
             // 
+            // txtFirmaAra
+            // 
+            resources.ApplyResources(this.txtFirmaAra, "txtFirmaAra");
+            this.txtFirmaAra.Name = "txtFirmaAra";
+            this.txtFirmaAra.TextChanged += new System.EventHandler(this.txtFirmaAra_TextChanged);
+            // 
+            // label2
+            // 
+            resources.ApplyResources(this.label2, "label2");
+            this.label2.Name = "label2";
+            // 
             // frmTopluYazdir
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtFirmaAra);
             this.Controls.Add(this.rdBtnHizmet);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnPrint);
@@ -162,6 +177,8 @@
         private System.Windows.Forms.PrintDialog printDialog;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.RadioButton rdBtnHizmet;
+        private System.Windows.Forms.TextBox txtFirmaAra;
+        private System.Windows.Forms.Label label2;
     }
 }
 
