@@ -203,9 +203,10 @@ namespace TopluYazdir
             label1.Text = $"{lstBoxFiles.Items.Count} Dosya Seçildi";
         }
 
+        const string path = "temp";
+
         public void Print(string[] files)
         {
-            string path = "temp";
             if (!Directory.Exists(path))
             {
                 DirectoryInfo di = Directory.CreateDirectory(path);
@@ -223,27 +224,15 @@ namespace TopluYazdir
                 outPdf.Save(path + "/files.pdf");
             }
 
-
             try
             {
                 if (printDialog.ShowDialog() == DialogResult.OK)
                 {
-                    //    //for (int i = 0; i < files.Length - 1; i++)
-                    //    //{
-                    //    //    Process.Start(
-                    //    //    Registry.LocalMachine.OpenSubKey(
-                    //    //    @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
-                    //    //    @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
-                    //    //    string.Format("/h /t \"{0}\" \"{1}\"", files[i], printDialog.PrinterSettings.PrinterName));
-                    //    //}
-                    //    foreach (var item in files)
-                    //    {
                     Process.Start(
                     Registry.LocalMachine.OpenSubKey(
                     @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
                     @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
                     string.Format("/h /t \"{0}\" \"{1}\"", path + "/files.pdf", printDialog.PrinterSettings.PrinterName));
-                    //    }
                 }
             }
             catch { }
@@ -277,7 +266,10 @@ namespace TopluYazdir
 
         private void frmTopluYazdir_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Directory.Delete("temp",true);
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
         }
     }
 }
