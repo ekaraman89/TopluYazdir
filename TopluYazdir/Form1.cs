@@ -1,4 +1,6 @@
 ﻿using Microsoft.Win32;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -203,26 +205,45 @@ namespace TopluYazdir
 
         public void Print(string[] files)
         {
+            string path = "temp";
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(path);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+
+            using (PdfDocument outPdf = new PdfDocument())
+            {
+                for (int i = 0; i < lstBoxFiles.Items.Count; i++)
+                {
+                    using (PdfDocument tmp = PdfReader.Open(lstBoxFiles.Items[i].ToString(), PdfDocumentOpenMode.Import))
+                        CopyPages(tmp, outPdf);
+                }
+
+                outPdf.Save(path + "/files.pdf");
+            }
+
+
             try
             {
                 if (printDialog.ShowDialog() == DialogResult.OK)
                 {
-                    //for (int i = 0; i < files.Length - 1; i++)
-                    //{
-                    //    Process.Start(
-                    //    Registry.LocalMachine.OpenSubKey(
-                    //    @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
-                    //    @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
-                    //    string.Format("/h /t \"{0}\" \"{1}\"", files[i], printDialog.PrinterSettings.PrinterName));
-                    //}
-                    foreach (var item in files)
-                    {
-                        Process.Start(
-                        Registry.LocalMachine.OpenSubKey(
-                        @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
-                        @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
-                        string.Format("/h /t \"{0}\" \"{1}\"", item, printDialog.PrinterSettings.PrinterName));
-                    }
+                    //    //for (int i = 0; i < files.Length - 1; i++)
+                    //    //{
+                    //    //    Process.Start(
+                    //    //    Registry.LocalMachine.OpenSubKey(
+                    //    //    @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                    //    //    @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
+                    //    //    string.Format("/h /t \"{0}\" \"{1}\"", files[i], printDialog.PrinterSettings.PrinterName));
+                    //    //}
+                    //    foreach (var item in files)
+                    //    {
+                    Process.Start(
+                    Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                    @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
+                    string.Format("/h /t \"{0}\" \"{1}\"", path + "/files.pdf", printDialog.PrinterSettings.PrinterName));
+                    //    }
                 }
             }
             catch { }
@@ -244,6 +265,19 @@ namespace TopluYazdir
 
             if (chkListFirma.Items.Count > 0)
                 chkListFirma.Items.Insert(0, "Tümünü Seç");
+        }
+
+        void CopyPages(PdfDocument from, PdfDocument to)
+        {
+            for (int i = 0; i < from.PageCount; i++)
+            {
+                to.AddPage(from.Pages[i]);
+            }
+        }
+
+        private void frmTopluYazdir_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Directory.Delete("temp",true);
         }
     }
 }

@@ -159,6 +159,7 @@
             this.Controls.Add(this.btnSelectFolder);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "frmTopluYazdir";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmTopluYazdir_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 
